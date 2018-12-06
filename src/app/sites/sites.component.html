@@ -1,0 +1,17 @@
+<h2>My Sites</h2>
+<table>
+  <tr>
+    <td>
+      <ul class="sites">
+        <li *ngFor="let site of sites"
+         [class.selected]="site === selectedSite"
+         (click)="onSelect(site)" >
+          <span class="badge">{{site.value.name}}</span> {{site.value.type}}
+        </li>
+      </ul>
+    </td>
+    <td>
+      <app-site [site]="selectedSite"></app-site>
+    </td>
+  </tr>
+</table>
