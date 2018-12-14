@@ -1,15 +1,42 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { Instrument } from '../instrument';
+import { InstrumentService } from '../instrument.service';
+import { Site } from '../site';
 
 @Component({
   selector: 'app-instruments',
   templateUrl: './instruments.component.html',
   styleUrls: ['./instruments.component.css']
 })
-export class InstrumentsComponent implements OnInit {
 
-  constructor() { }
+export class InstrumentsComponent implements OnInit {
+  @Input() site: Site;
+
+  selectedInstrument: Instrument;
+
+  instruments: Instrument[];
+
+  constructor(private instrumentService: InstrumentService) { }
 
   ngOnInit() {
+    if (this.site != null){
+      this.getInstrumentsBySite(this.site);
+    }else{
+      this.getInstruments()
+    }
+  }
+
+  onSelect(instrument: Instrument): void {
+    this.selectedInstrument= instrument;
+  }
+
+  getInstrumentsBySite(site): void {
+    this.instrumentService.getInstrumentsBySite(site)
+        .subscribe(instruments => this.instruments = instruments);
+  }
+  getInstruments(): void {
+    this.instrumentService.getInstruments()
+        .subscribe(instruments => this.instruments = instruments);
   }
 
 }

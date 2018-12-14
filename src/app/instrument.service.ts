@@ -10,9 +10,14 @@ import {Token} from './token'
   providedIn: 'root'
 })
 export class InstrumentService {
-  private siteUrl = Token.BASEURL +'/instruments';  // URL to web api
+  private instrumentUrl = Token.BASEURL +'/instruments';  // URL to web api
+  private testSiteUUID = '1940996399071695336-242ac1111-0001-012';
 
-  getSites(): Observable<Instrument[]> {
+  constructor(private http: HttpClient,
+    private messageService: MessageService)  {
+  }
+
+  getInstruments(): Observable<Instrument[]> {
     //fetch Instrument from Agave Chords API
 
     let head = new HttpHeaders()
@@ -23,7 +28,34 @@ export class InstrumentService {
       headers: head
     };
 
-    let response = this.http.get<ResponseResults>(this.siteUrl, options)
+    let response = this.http.get<ResponseResults>(this.instrumentUrl, options)
+    .pipe(
+      retry(3),
+      map((data) => {
+        return data.result as Instrument[];
+      }),
+      catchError((e) => {
+        return Observable.throw(new Error(e.message));
+      })
+    );
+    return response;
+    interface ResponseResults {
+      result: any
+    }
+  }
+
+  getInstrumentsBySite(site): Observable<Instrument[]> {
+    //fetch Instrument from Agave Chords API
+
+    let head = new HttpHeaders()
+    .set("Authorization", "Bearer " + Token.TOKEN)
+    .set("Content-Type", "application/x-www-form-urlencoded");
+  //  .set('Access-Control-Allow-Origin','*');
+    let options = {
+      headers: head
+    };
+
+    let response = this.http.get<ResponseResults>(this.instrumentUrl+'?site_uuid='+site.uuid, options)
     .pipe(
       retry(3),
       map((data) => {
